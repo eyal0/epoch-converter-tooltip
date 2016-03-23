@@ -63,7 +63,15 @@
         best_date = current_date;
       }
     }
-    showToolTip('<div>' + best_date.toString() + '</div>');
+    var html_results = '<div>';
+    if (options['show_local_time']) {
+      html_results += best_date.toString() + '<br />';
+    }
+    if (options['show_utc']) {
+      html_results += best_date.toUTCString() + "<br />";
+    }
+    html_results += "</div>";
+    showToolTip(html_results);
   }
 
   function getStringOffsetFromPoint(elem, x, y) {
@@ -267,7 +275,7 @@
   }
 
   function options_callback(current_options) {
-    //below copied from ECT-options.html
+    //below copied from ECT-options.js
     if (!current_options) {
       current_options = {};
     }
@@ -290,6 +298,9 @@
     if(current_options['trigger_keyboard_shift'] == undefined) current_options['trigger_keyboard_shift'] = 0;
     if(current_options['tooltipCharacter'] == undefined) current_options['tooltipCharacter'] = 'T';
 
+    if(current_options['show_local_time'] == undefined) current_options['show_local_time'] = 0;
+    if(current_options['show_utc'] == undefined) current_options['show_utc'] = 1;
+    
     if(current_options['hide_move'] == undefined) current_options['hide_move'] = 1;
     if(current_options['hide_click'] == undefined) current_options['hide_click'] = 1;
     if(current_options['hide_scroll'] == undefined) current_options['hide_scroll'] = 1;

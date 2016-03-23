@@ -19,6 +19,9 @@ function save_options() {
                   'trigger_keyboard_shift' : document.getElementById("TriggerKeyboardShift").checked,
                   'tooltipCharacter' : document.getElementById("TriggerKeyboardCharacter").value,
 
+                  'show_local_time' : document.getElementById("ShowLocalTime").checked,
+                  'show_utc' : document.getElementById("ShowUTC").checked,
+
                   'hide_move' : document.getElementById("HideMove").checked,
                   'hide_click' : document.getElementById("HideClick").checked,
                   'hide_scroll' : document.getElementById("HideScroll").checked,
@@ -57,6 +60,9 @@ function restore_options() {
   if(options['trigger_keyboard_shift'] == undefined) options['trigger_keyboard_shift'] = 0;
   if(options['tooltipCharacter'] == undefined) options['tooltipCharacter'] = 'T';
 
+  if(options['show_local_time'] == undefined) options['show_local_time'] = 0;
+  if(options['show_utc'] == undefined) options['show_utc'] = 1;
+
   if(options['hide_move'] == undefined) options['hide_move'] = 1;
   if(options['hide_click'] == undefined) options['hide_click'] = 1;
   if(options['hide_scroll'] == undefined) options['hide_scroll'] = 1;
@@ -86,6 +92,9 @@ function restore_options() {
   document.getElementById("TriggerKeyboardAlt").checked = options['trigger_keyboard_alt'];
   document.getElementById("TriggerKeyboardShift").checked = options['trigger_keyboard_shift'];
   document.getElementById("TriggerKeyboardCharacter").value = options['tooltipCharacter'];
+
+  document.getElementById("ShowLocalTime").checked = options['show_local_time'];
+  document.getElementById("ShowUTC").checked = options['show_utc'];
 
   document.getElementById("HideMove").checked = options['hide_move'];
   document.getElementById("HideClick").checked = options['hide_click'];
