@@ -1,0 +1,45 @@
+﻿<html>
+<head><title>Hebrew Tooltip Translations Options</title>
+<script type="text/javascript" src="ECT-options.js"></script>
+<body>
+  <img src="HTT-128.png"><br />
+  <h1>Hebrew Tooltip Translation for Google Chrome™</h1>
+  <a href='http://code.google.com/p/hebrew-tooltip-translations-for-chrome/'>Project homepage</a>
+  <a href='http://code.google.com/p/hebrew-tooltip-translations-for-chrome/issues/list'>Report problems</a><br />
+    <h2>Show translation</h2>
+      <input type="checkbox" id="TriggerHover"/><label for="TriggerHover">Show Tooltip after hovering </label><input type="text" id="TriggerHoverDelay"/><label for="TriggerHover"> milliseconds</label><br />
+
+      <input type="checkbox" id="TriggerClick"/><label for="TriggerClick">Show Tooltip after clicking on a word</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerClickCtrl"/><label for="TriggerClickCtrl">With Ctrl</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerClickAlt"/><label for="TriggerClickAlt">With Alt</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerClickShift"/><label for="TriggerClickShift">With Shift</label><br />
+
+      <input type="checkbox" id="TriggerHighlight"/><label for="TriggerHighlight">Show Tooltip after selecting a word or phrase</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerHighlightCtrl"/><label for="TriggerHighlightCtrl">With Ctrl</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerHighlightAlt"/><label for="TriggerHighlightAlt">With Alt</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerHighlightShift"/><label for="TriggerHighlightShift">With Shift</label><br />
+
+      <input type="checkbox" id="TriggerKeyboard"/><label for="TriggerKeyboard">Show Tooltip after pressing </label><input type="text" id="TriggerKeyboardCharacter"/><label for="TriggerKeyboard"> (or leave empty to show tooltip with just Ctrl, Alt, Shift, etc.)</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerKeyboardCtrl"/><label for="TriggerKeyboardCtrl">With Ctrl</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerKeyboardAlt"/><label for="TriggerKeyboardAlt">With Alt</label><br />
+      &nbsp; &nbsp; <input type="checkbox" id="TriggerKeyboardShift"/><label for="TriggerKeyboardShift">With Shift</label><br />
+
+    <h2>Hide translation</h2>
+      <input type="checkbox" id="HideMove"/><label for="HideMove">Hide Tooltip after moving mouse</label><br />
+      <input type="checkbox" id="HideClick"/><label for="HideClick">Hide Tooltip after clicking mouse</label><br />
+      <input type="checkbox" id="HideScroll"/><label for="HideClick">Hide Tooltip after scrolling mousewheel</label><br />
+      <input type="checkbox" id="HideKeyboard"/><label for="HideKeyboard">Hide Tooltip after any keyboard button</label><br />
+
+    <h2>Translation Location</h2>
+      <span class="Header">Relative to mouse cursor</span><br />
+      &nbsp; &nbsp; <input type="radio" name="LocationX" id="LocationX0" value="0" /><label for="LocationX0">To the left</label>
+      &nbsp; &nbsp; <input type="radio" name="LocationX" id="LocationX1" value="1" /><label for="LocationX1">To the right</label><br />
+      &nbsp; &nbsp; <input type="radio" name="LocationY" id="LocationY1" value="1" /><label for="LocationY1">Below</label>
+      &nbsp; &nbsp; <input type="radio" name="LocationY" id="LocationY0" value="0" /><label for="LocationY0">Above</label><br />
+      <input type="checkbox" id="KeepOnScreen"/><label for="KeepOnScreen">Keep Tooltips on screen</label><br />
+      
+    <h2>While Translating</h2>
+      <input type="checkbox" id="ActivityIndicator"/><label for="ActivityIndicator">Show activity indicator</label><br />
+    <button id="save_button">Save</button>
+</body>
+</html>

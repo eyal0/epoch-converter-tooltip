@@ -55,20 +55,15 @@
   }
 
   function processText(input) {
-    if(input != '') {
-      var regexMatch = /^-?[0-9]+(?:.[0-9]+)?$/.exec(input);
-      var closest;
-      if (regexMatch) {
-        var time_int = parseInt(regexMatch[0]);
-        var best_date;
-        for (var exponent = -3; exponent <= 6; exponent++) {
-          var current_date = new Date(Math.pow(10, exponent) * time_int);
-          if (!closest || Math.abs(Date() - current_date) < Math.abs(Date() - best_date)) {
-            current_date = best_date
-          }
-        }
-        showToolTip(best_date.toString());
+    var time_int = parseInt(input);
+    var best_date;
+    for (var exponent = -3; exponent <= 6; exponent+=3) {
+      var current_date = new Date(Math.pow(10, exponent) * time_int);
+      if (!best_date || Math.abs(new Date() - current_date) < Math.abs(new Date() - best_date)) {
+        best_date = current_date;
+      }
     }
+    showToolTip('<div>' + best_date.toString() + '</div>');
   }
 
   function getStringOffsetFromPoint(elem, x, y) {
@@ -117,9 +112,11 @@
     }
   }
 
-  function HTTgetWord() {
+  var valid_word = /^-?[0-9]+(?:.[0-9]+)?$/;
+
+  function getWord() {
     var text = "";
-    var str_offset = getStringOffsetFromPoint(HTTelem, HTTcurX, HTTcurY);
+    var str_offset = getStringOffsetFromPoint(elem, curX, curY);
     if(str_offset) {
       var range = window.getSelection();
       if(range && //there is a range
@@ -133,7 +130,6 @@
         var str = str_offset.string;
         var start = str_offset.offset;
         var end = start + 1;
-        var valid_word = /^((\w)+|([\u0590-\u05ff\"\']+))$/;
         if(!valid_word.test(str.substring(start, end)))
           return null;
         while(start > 0 && valid_word.test(str.substring(start - 1, end)))
@@ -142,46 +138,45 @@
           end++;
         text = str.substring(start, end);
       }
-    }
-    processText(text);
-  }
-
-  function HTThide(force) {
-    if(HTTtimeoutID || force) {
-      HTTdefinitions = "";
-      HTTtooltip.style.visibility = "hidden";
-      HTTtooltip.innerHTML = HTTdefinitions;
-      HTTtooltip.style.left = 0 + "px";
-      HTTtooltip.style.top = 0 + "px";
-      HTTtooltip.style.width = 0 + "px";
-      HTTtooltip.style.height = 0 + "px";
-      window.clearTimeout(HTTtimeoutID);
-      HTTtimeoutID = 0;
+      processText(text);
     }
   }
 
-  function HTTmousescroll(event) {
+  function hide(force) {
+    if(timeoutID || force) {
+      tooltip.style.visibility = "hidden";
+      tooltip.innerHTML = "";
+      tooltip.style.left = 0 + "px";
+      tooltip.style.top = 0 + "px";
+      tooltip.style.width = 0 + "px";
+      tooltip.style.height = 0 + "px";
+      window.clearTimeout(timeoutID);
+      timeoutID = 0;
+    }
+  }
+
+  function mousescroll(event) {
     var e = event;
 
     //variables for use in displaying the translation
-    HTTelem = e.target;
-    HTTcurX = e.clientX;
-    HTTcurY = e.clientY;
+    elem = e.target;
+    curX = e.clientX;
+    curY = e.clientY;
 
     //GM_log("got click");
-    if(HTToptions['hide_scroll'])
-      HTThide(true); //hide the old one if there is one
-    if(HTToptions['trigger_hover'])
-      HTTtimeoutID = window.setTimeout(HTTgetWord, HTToptions['HTTtooltipDelay']);
+    if(options['hide_scroll'])
+      hide(true); //hide the old one if there is one
+    if(options['trigger_hover'])
+      timeoutID = window.setTimeout(getWord, options['tooltipDelay']);
     return;
   }
 
-  function HTTkeypress(event) {
+  function keypress(event) {
     var e = event;
     
     //GM_log("got keypress");
-    if(HTToptions['hide_keyboard'])
-      HTThide(true); //hide the old one if there is one
+    if(options['hide_keyboard'])
+      hide(true); //hide the old one if there is one
 
     var keynum;
     var keychar;
@@ -195,142 +190,140 @@
 
     keychar = String.fromCharCode(keynum);
     //GM_log("keychar is " + keychar);
-    if(HTToptions['trigger_keyboard'] &&
-       (HTToptions['HTTtooltipCharacter'] == '' || HTToptions['HTTtooltipCharacter'].indexOf(keychar) >= 0) &&
-       (HTToptions['trigger_keyboard_ctrl'] == e.ctrlKey) &&
-       (HTToptions['trigger_keyboard_alt'] == e.altKey) &&
-       (HTToptions['trigger_keyboard_shift'] == e.shiftKey)) {
+    if(options['trigger_keyboard'] &&
+       (options['tooltipCharacter'] == '' || options['tooltipCharacter'].indexOf(keychar) >= 0) &&
+       (options['trigger_keyboard_ctrl'] == e.ctrlKey) &&
+       (options['trigger_keyboard_alt'] == e.altKey) &&
+       (options['trigger_keyboard_shift'] == e.shiftKey)) {
       //GM_log("match");
       if(window.getSelection() != '') {
         //GM_log("translating phrase " + window.getSelection());
         processText(window.getSelection());
       } else {
-        HTTgetWord(); //get the word under the cursor right now and translate it
+        getWord(); //get the word under the cursor right now and translate it
       }
     }
     return;
   }
 
-  function HTTmouseup(event) {
+  function mouseup(event) {
     var e = event;
     
-    HTTcurX=e.clientX;
-    HTTcurY=e.clientY;
-    //GM_log("got mouseup " + window.getSelection());
-    //HTThide(true); //hide the old one if there is one
+    curX=e.clientX;
+    curY=e.clientY;
 
     //variables for use in displaying the translation
     //GM_log("try to translate " + window.getSelection());
     if(window.getSelection() != '' &&
-       HTToptions['trigger_highlight'] &&
-       (HTToptions['trigger_highlight_ctrl'] == e.ctrlKey) &&
-       (HTToptions['trigger_highlight_alt'] == e.altKey) &&
-       (HTToptions['trigger_highlight_shift'] == e.shiftKey))
+       options['trigger_highlight'] &&
+       (options['trigger_highlight_ctrl'] == e.ctrlKey) &&
+       (options['trigger_highlight_alt'] == e.altKey) &&
+       (options['trigger_highlight_shift'] == e.shiftKey))
       processText(window.getSelection());
     return;
   }
 
-  function HTTclick(event) {
+  function click(event) {
     var e = event;
 
     //click is used by many handlers, mostly to hide the tooltip
     //variables for use in displaying the translation
-    HTTelem = e.target;
-    HTTcurX = e.clientX;
-    HTTcurY = e.clientY;
+    elem = e.target;
+    curX = e.clientX;
+    curY = e.clientY;
 
     //GM_log("got click");
-    if(HTToptions['hide_click'])
-      HTThide(true); //hide the old one if there is one
-    if(HTToptions['trigger_click'] &&
-       (HTToptions['trigger_click_ctrl'] == e.ctrlKey) &&
-       (HTToptions['trigger_click_alt'] == e.altKey) &&
-       (HTToptions['trigger_click_shift'] == e.shiftKey))
-      HTTgetWord(); //get the word under the cursor right now
+    if(options['hide_click'])
+      hide(true); //hide the old one if there is one
+    if(options['trigger_click'] &&
+       (options['trigger_click_ctrl'] == e.ctrlKey) &&
+       (options['trigger_click_alt'] == e.altKey) &&
+       (options['trigger_click_shift'] == e.shiftKey))
+      getWord(); //get the word under the cursor right now
     return;
   }
 
-  function HTTmousemove(event) {
+  function mousemove(event) {
     var e = event;
 
-    if(HTTelem == e.target && HTTcurX == e.clientX && HTTcurY == e.clientY)
+    if(elem == e.target && curX == e.clientX && curY == e.clientY)
       return; //already got this mousemove so ignore it
       
     //variables for use in finding the word and displaying the translation
-    HTTelem = e.target;
-    HTTcurX = e.clientX;
-    HTTcurY = e.clientY;
+    elem = e.target;
+    curX = e.clientX;
+    curY = e.clientY;
 
-    if(HTToptions['hide_move'])
-      HTThide(true);
-    if(HTToptions['trigger_hover'])
-      HTTtimeoutID = window.setTimeout(HTTgetWord, HTToptions['HTTtooltipDelay']);
+    if(options['hide_move'])
+      hide(true);
+    if(options['trigger_hover'])
+      timeoutID = window.setTimeout(getWord, options['tooltipDelay']);
     return;
   }
 
-  function HTTinit () {
-    chrome.extension.sendRequest({'action' : 'localStorage_get', 'attribute' : 'options'}, HTToptions_callback);
+  function init () {
+    chrome.extension.sendRequest({'action' : 'localStorage_get', 'attribute' : 'options'}, options_callback);
     //don't continue until the callback completes
   }
 
-  function HTToptions_callback(options) {
-    //below copied from HTT-options.html
-    if (!options) {
-      options = {};
+  function options_callback(current_options) {
+    //below copied from ECT-options.html
+    if (!current_options) {
+      current_options = {};
     }
-    if(options['trigger_hover'] == undefined) options['trigger_hover'] = 1;
-    if(options['HTTtooltipDelay'] == undefined) options['HTTtooltipDelay'] = 1000;
+    if(current_options['trigger_hover'] == undefined) current_options['trigger_hover'] = 1;
+    if(current_options['tooltipDelay'] == undefined) current_options['tooltipDelay'] = 1000;
 
-    if(options['trigger_click'] == undefined) options['trigger_click'] = 0;
-    if(options['trigger_click_ctrl'] == undefined) options['trigger_click_ctrl'] = 0;
-    if(options['trigger_click_alt'] == undefined) options['trigger_click_alt'] = 0;
-    if(options['trigger_click_shift'] == undefined) options['trigger_click_shift'] = 0;
+    if(current_options['trigger_click'] == undefined) current_options['trigger_click'] = 0;
+    if(current_options['trigger_click_ctrl'] == undefined) current_options['trigger_click_ctrl'] = 0;
+    if(current_options['trigger_click_alt'] == undefined) current_options['trigger_click_alt'] = 0;
+    if(current_options['trigger_click_shift'] == undefined) current_options['trigger_click_shift'] = 0;
     
-    if(options['trigger_highlight'] == undefined) options['trigger_highlight'] = 0;
-    if(options['trigger_highlight_ctrl'] == undefined) options['trigger_highlight_ctrl'] = 0;
-    if(options['trigger_highlight_alt'] == undefined) options['trigger_highlight_alt'] = 0;
-    if(options['trigger_highlight_shift'] == undefined) options['trigger_highlight_shift'] = 0;
+    if(current_options['trigger_highlight'] == undefined) current_options['trigger_highlight'] = 0;
+    if(current_options['trigger_highlight_ctrl'] == undefined) current_options['trigger_highlight_ctrl'] = 0;
+    if(current_options['trigger_highlight_alt'] == undefined) current_options['trigger_highlight_alt'] = 0;
+    if(current_options['trigger_highlight_shift'] == undefined) current_options['trigger_highlight_shift'] = 0;
 
-    if(options['trigger_keyboard'] == undefined) options['trigger_keyboard'] = 0;
-    if(options['trigger_keyboard_ctrl'] == undefined) options['trigger_keyboard_ctrl'] = 0;
-    if(options['trigger_keyboard_alt'] == undefined) options['trigger_keyboard_alt'] = 0;
-    if(options['trigger_keyboard_shift'] == undefined) options['trigger_keyboard_shift'] = 0;
-    if(options['HTTtooltipCharacter'] == undefined) options['HTTtooltipCharacter'] = 'T';
+    if(current_options['trigger_keyboard'] == undefined) current_options['trigger_keyboard'] = 0;
+    if(current_options['trigger_keyboard_ctrl'] == undefined) current_options['trigger_keyboard_ctrl'] = 0;
+    if(current_options['trigger_keyboard_alt'] == undefined) current_options['trigger_keyboard_alt'] = 0;
+    if(current_options['trigger_keyboard_shift'] == undefined) current_options['trigger_keyboard_shift'] = 0;
+    if(current_options['tooltipCharacter'] == undefined) current_options['tooltipCharacter'] = 'T';
 
-    if(options['hide_move'] == undefined) options['hide_move'] = 1;
-    if(options['hide_click'] == undefined) options['hide_click'] = 1;
-    if(options['hide_scroll'] == undefined) options['hide_scroll'] = 1;
-    if(options['hide_keyboard'] == undefined) options['hide_keyboard'] = 1;
+    if(current_options['hide_move'] == undefined) current_options['hide_move'] = 1;
+    if(current_options['hide_click'] == undefined) current_options['hide_click'] = 1;
+    if(current_options['hide_scroll'] == undefined) current_options['hide_scroll'] = 1;
+    if(current_options['hide_keyboard'] == undefined) current_options['hide_keyboard'] = 1;
 
-    if(options['align_top'] == undefined) options['align_top'] = 1;
-    if(options['align_left'] == undefined) options['align_left'] = 1;
-    if(options['keep_on_screen'] == undefined) options['keep_on_screen'] = 1;
+    if(current_options['align_top'] == undefined) current_options['align_top'] = 1;
+    if(current_options['align_left'] == undefined) current_options['align_left'] = 1;
+    if(current_options['keep_on_screen'] == undefined) current_options['keep_on_screen'] = 1;
     
-    if(options['activity_indicator'] == undefined) options['activity_indicator'] = 1;
+    if(current_options['activity_indicator'] == undefined) current_options['activity_indicator'] = 1;
     
-    HTToptions = options;
+    options = current_options;
 
-    if(HTToptions['trigger_hover'] || HTToptions['hide_move']) {
-      window.addEventListener("mousemove", HTTmousemove, false);
+    if(options['trigger_hover'] || options['hide_move']) {
+      window.addEventListener("mousemove", mousemove, false);
     }
-    if(HTToptions['trigger_click'] || HTToptions['hide_click']) {
-      window.addEventListener("click", HTTclick, false);
+    if(options['trigger_click'] || options['hide_click']) {
+      window.addEventListener("click", click, false);
     }
-    if(HTToptions['trigger_highlight']) {
-      window.addEventListener("mouseup", HTTmouseup, false);
+    if(options['trigger_highlight']) {
+      window.addEventListener("mouseup", mouseup, false);
     }
-    if(HTToptions['trigger_keyboard'] || HTToptions['hide_keyboard']) {
-      window.addEventListener("keypress", HTTkeypress, false);
+    if(options['trigger_keyboard'] || options['hide_keyboard']) {
+      window.addEventListener("keypress", keypress, false);
     }
-    if(HTToptions['trigger_keyboard'] || HTToptions['hide_keyboard']) {
-      window.addEventListener("keydown", HTTkeypress, false);
+    if(options['trigger_keyboard'] || options['hide_keyboard']) {
+      window.addEventListener("keydown", keypress, false);
     }
-    if(HTToptions['hide_scroll']) {
-      window.addEventListener("scroll", HTTmousescroll, false);
+    if(options['hide_scroll']) {
+      window.addEventListener("scroll", mousescroll, false);
     }
-    HTTtooltip = document.createElement("div");
-    HTTtooltip.className = "HTT HTTtooltip"; //for use by users that might do things with stylish
-    document.body.insertBefore(HTTtooltip, document.body.firstChild);
+    tooltip = document.createElement("div");
+    tooltip.className = "ECT ECTtooltip"; //for use by users that might do things with stylish
+    document.body.insertBefore(tooltip, document.body.firstChild);
   }
-  HTTinit();
+  init();
 })();
