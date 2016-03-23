@@ -1,44 +1,43 @@
 (function() {
   //globals
-  var HTTtimeoutID;
-  var HTTelem;
-  var HTTcurX;
-  var HTTcurY;
-  var HTTtooltip;
-  var HTTdefinitions = ""; //translation output
-  var HTToptions;
+  var timeoutID;
+  var elem;
+  var curX;
+  var curY;
+  var tooltip;
+  var options;
 
   //helper functions
   function appendChild(child,parent){return(parent.insertBefore(child,parent.lastChild.nextSibling));}
 
-  function HTTshowToolTip() {
-    if(HTTdefinitions.length) {
+  function showToolTip(html_results) {
+    if(html_results.length) {
       var minX, minY, maxX, maxY, ttX, ttY;
 
-      HTTtooltip.style.width = "auto";
-      HTTtooltip.style.height = "auto";
-      HTTtooltip.innerHTML = HTTdefinitions;
-      HTTtooltip.firstChild.style.marginTop = "0";
-      HTTtooltip.firstChild.style.marginRight = "0";
-      HTTtooltip.firstChild.style.marginBottom = "0";
-      HTTtooltip.firstChild.style.marginLeft = "0";
-      ttX = HTTcurX;// + window.scrollX;
-      ttY = HTTcurY;// + window.scrollY;
-      if(HTToptions['align_left']) {
+      tooltip.style.width = "auto";
+      tooltip.style.height = "auto";
+      tooltip.innerHTML = html_results;
+      tooltip.firstChild.style.marginTop = "0";
+      tooltip.firstChild.style.marginRight = "0";
+      tooltip.firstChild.style.marginBottom = "0";
+      tooltip.firstChild.style.marginLeft = "0";
+      ttX = curX;
+      ttY = curY;
+      if(options['align_left']) {
         ttX += 10;
       } else {
-        ttX -= HTTtooltip.scrollWidth + 10;
+        ttX -= tooltip.scrollWidth + 10;
       }
-      if(HTToptions['align_top']) {
+      if(options['align_top']) {
         ttY += 10;
       } else {
-        ttY -= HTTtooltip.scrollHeight + 10;
+        ttY -= tooltip.scrollHeight + 10;
       }
-      minX = 0;//window.scrollX;
-      minY = 0;//window.scrollY;
-      maxX = minX + window.innerWidth - HTTtooltip.scrollWidth;
-      maxY = minY + window.innerHeight - HTTtooltip.scrollHeight;
-      if(HTToptions['keep_on_screen']) {
+      minX = 0;
+      minY = 0;
+      maxX = minX + window.innerWidth - tooltip.scrollWidth;
+      maxY = minY + window.innerHeight - tooltip.scrollHeight;
+      if(options['keep_on_screen']) {
         if(ttX < minX)
           ttX = minX;
         else if(ttX > maxX)
@@ -48,109 +47,27 @@
         else if(ttY > maxY)
           ttY = maxY;
       }
-      HTTtooltip.style.left = ttX + "px";
-      HTTtooltip.style.top = ttY + "px";
+      tooltip.style.left = ttX + "px";
+      tooltip.style.top = ttY + "px";
 
-      HTTtooltip.style.visibility="visible";
+      tooltip.style.visibility="visible";
     }
   }
 
-  function HTTparseResponse(responseText) {
-    HTThide(true);
-    if(responseText == null) return;  //quit if we didn't get anything
-
-    var tempDiv = document.createElement('div');
-    tempDiv.innerHTML = responseText.replace(/<script(.|\s)*?\/script>/gi, '').replace(/src="[^"]*"/gi, '');
-
-    var translations_e2h = tempDiv.getElementsByClassName('translate_box_en box');
-    var results = new Array();
-    var rtl = 0; //count how many of each type
-    for(var i = 0; i < translations_e2h.length; i++) {
-      if(translations_e2h[i].getElementsByClassName('word').length > 0 &&
-         translations_e2h[i].getElementsByClassName('diber').length > 0 &&
-         translations_e2h[i].getElementsByClassName('translation translation_he').length > 0) {
-        var new_result = new Object;
-        new_result['word'] = translations_e2h[i].getElementsByClassName('word')[0].innerText;
-        new_result['partOfSpeech'] = translations_e2h[i].getElementsByClassName('diber')[0].innerText;
-        new_result['definition'] = translations_e2h[i].getElementsByClassName('translation translation_he')[0].innerText;
-        new_result['rtl'] = 0;
-        rtl--;
-        results.push(new_result);
-      }
-    }
-
-    var translations_h2e = tempDiv.getElementsByClassName('translate_box');
-    for(var i = 0; i < translations_h2e.length; i++) {
-      if(translations_h2e[i].getElementsByClassName('word').length > 0 &&
-         translations_h2e[i].getElementsByClassName('diber').length > 0 &&
-         translations_h2e[i].getElementsByClassName('default_trans').length > 0) {
-        var new_result = new Object;
-        new_result['word'] = translations_h2e[i].getElementsByClassName('word')[0].innerText;
-        new_result['partOfSpeech'] = translations_h2e[i].getElementsByClassName('diber')[0].innerText;
-        new_result['definition'] = translations_h2e[i].getElementsByClassName('default_trans')[0].innerText;
-        new_result['rtl'] = 1;
-        rtl++;
-        results.push(new_result);
-      }
-    }
-    tempDiv = null;
-
-    if(results.length > 0) {
-      var rtl = (rtl > 0); //map to either 0 or 1
-      HTTdefinitions = "";
-      HTTdefinitions += "<table class='HTT " + (rtl?"HTTHebrew":"HTTEnglish") + "' dir=\"\"><tbody class='HTT " + (rtl?"HTTHebrew":"HTTEnglish") + "' dir=\"\">\n";
-      for(var i = 0; i < results.length; i++) {
-        HTTdefinitions += "<tr class='HTT'>";
-        HTTdefinitions += "<td class='HTT HTTWord " + (results[i].rtl?"HTTHebrew":"HTTEnglish") + "'>" + results[i].word + "</td>\n";
-        HTTdefinitions += "<td class='HTT HTTPartOfSpeech " + (results[i].rtl?"HTTHebrew":"HTTEnglish") + "'>" + results[i].partOfSpeech + "</td>\n";
-        HTTdefinitions += "<td class='HTT HTTDefinition " + (!results[i].rtl?"HTTHebrew":"HTTEnglish") + "'>" + results[i].definition + "</td>";
-        HTTdefinitions += "</tr>\n";
-      }
-      HTTdefinitions += "</tbody></table>";
-      HTTshowToolTip();
-    }
-  }
-
-  function HTTtranslateWord(input) {
+  function processText(input) {
     if(input != '') {
-      if(HTToptions['activity_indicator']) {
-        HTTtooltip.style.width = "auto";
-        HTTtooltip.style.height = "auto";
-        HTTtooltip.innerHTML = "<span class='HTT HTTActivityIndicator'>HTT...</span>"
-        ttX = HTTcurX;
-        ttY = HTTcurY;
-        if(HTToptions['align_left']) {
-          ttX += 10;
-        } else {
-          ttX -= HTTtooltip.scrollWidth + 10;
+      var regexMatch = /^-?[0-9]+(?:.[0-9]+)?$/.exec(input);
+      var closest;
+      if (regexMatch) {
+        var time_int = parseInt(regexMatch[0]);
+        var best_date;
+        for (var exponent = -3; exponent <= 6; exponent++) {
+          var current_date = new Date(Math.pow(10, exponent) * time_int);
+          if (!closest || Math.abs(Date() - current_date) < Math.abs(Date() - best_date)) {
+            current_date = best_date
+          }
         }
-        if(HTToptions['align_top']) {
-          ttY += 10;
-        } else {
-          ttY -= HTTtooltip.scrollHeight + 10;
-        }
-        minX = 0;
-        minY = 0;
-        maxX = minX + window.innerWidth - HTTtooltip.scrollWidth;
-        maxY = minY + window.innerHeight - HTTtooltip.scrollHeight;
-        if(HTToptions['keep_on_screen']) {
-          if(ttX < minX)
-            ttX = minX;
-          else if(ttX > maxX)
-            ttX = maxX;
-          if(ttY < minY)
-            ttY = minY;
-          else if(ttY > maxY)
-            ttY = maxY;
-        }
-        HTTtooltip.style.left = ttX + "px";
-        HTTtooltip.style.top = ttY + "px";
-
-        HTTtooltip.style.visibility="visible";
-      }
-      var HTTreq;
-
-      chrome.extension.sendRequest({'action' : 'xhr', 'url' : 'http://www.morfix.co.il/' + encodeURIComponent(input)}, HTTparseResponse);
+        showToolTip(best_date.toString());
     }
   }
 
@@ -226,7 +143,7 @@
         text = str.substring(start, end);
       }
     }
-    HTTtranslateWord(text);
+    processText(text);
   }
 
   function HTThide(force) {
@@ -286,7 +203,7 @@
       //GM_log("match");
       if(window.getSelection() != '') {
         //GM_log("translating phrase " + window.getSelection());
-        HTTtranslateWord(window.getSelection());
+        processText(window.getSelection());
       } else {
         HTTgetWord(); //get the word under the cursor right now and translate it
       }
@@ -309,7 +226,7 @@
        (HTToptions['trigger_highlight_ctrl'] == e.ctrlKey) &&
        (HTToptions['trigger_highlight_alt'] == e.altKey) &&
        (HTToptions['trigger_highlight_shift'] == e.shiftKey))
-      HTTtranslateWord(window.getSelection());
+      processText(window.getSelection());
     return;
   }
 
