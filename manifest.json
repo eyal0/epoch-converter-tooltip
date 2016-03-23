@@ -4,9 +4,9 @@
   "manifest_version": 2,
   "description": "Convert timestamps to readable times",
   "icons": {
-    "16": "HTT-16.png",
-    "48": "HTT-48.png",
-    "128": "HTT-128.png"
+    "16": "ECT-16.png",
+    "48": "ECT-48.png",
+    "128": "ECT-128.png"
   },
   "background" : {
     "scripts": ["ECT-background.js"],
