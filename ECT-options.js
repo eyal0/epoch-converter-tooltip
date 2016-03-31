@@ -19,8 +19,8 @@ function save_options() {
                   'trigger_keyboard_shift' : document.getElementById("TriggerKeyboardShift").checked,
                   'tooltipCharacter' : document.getElementById("TriggerKeyboardCharacter").value,
 
-                  'show_local_time' : document.getElementById("ShowLocalTime").checked,
-                  'show_utc' : document.getElementById("ShowUTC").checked,
+                  'locales' : document.getElementById("Locales").value,
+                  'timezones' : document.getElementById("Timezones").value,
 
                   'hide_move' : document.getElementById("HideMove").checked,
                   'hide_click' : document.getElementById("HideClick").checked,
@@ -60,8 +60,8 @@ function restore_options() {
   if(options['trigger_keyboard_shift'] == undefined) options['trigger_keyboard_shift'] = 0;
   if(options['tooltipCharacter'] == undefined) options['tooltipCharacter'] = 'T';
 
-  if(options['show_local_time'] == undefined) options['show_local_time'] = 0;
-  if(options['show_utc'] == undefined) options['show_utc'] = 1;
+  if(options['locales'] == undefined) options['locales'] = "en-US";
+  if(options['timezones'] == undefined) options['timezones'] = "UTC,America/Los_Angeles";
 
   if(options['hide_move'] == undefined) options['hide_move'] = 1;
   if(options['hide_click'] == undefined) options['hide_click'] = 1;
@@ -93,8 +93,8 @@ function restore_options() {
   document.getElementById("TriggerKeyboardShift").checked = options['trigger_keyboard_shift'];
   document.getElementById("TriggerKeyboardCharacter").value = options['tooltipCharacter'];
 
-  document.getElementById("ShowLocalTime").checked = options['show_local_time'];
-  document.getElementById("ShowUTC").checked = options['show_utc'];
+  document.getElementById("Locales").value = options['locales'];
+  document.getElementById("Timezones").value = options['timezones'];
 
   document.getElementById("HideMove").checked = options['hide_move'];
   document.getElementById("HideClick").checked = options['hide_click'];
@@ -110,7 +110,36 @@ function restore_options() {
   document.getElementById("ActivityIndicator").checked = options['activity_indicator'];
 }
 
+function updateSamples() {
+  var samples = document.getElementById("samples");
+  var html_results = "";
+  var best_date = new Date();
+  var locales = document.getElementById("Locales").value.split(',');
+  var timezones = document.getElementById("Timezones").value.split(',');
+  for (var l=0; l < locales.length; l++) {
+    var locale = locales[l];
+    for (var t=0; t < timezones.length; t++) {
+      var timezone = timezones[t];
+      html_results += "'<b>" + locale + "</b>','<b>" + timezone + "</b>': "
+      try {
+        html_results += best_date.toLocaleString(locale, {'timeZoneName': 'short', 'timeZone': timezone}) 
+      } catch (err) {
+        html_results += err.toString();
+      }
+      html_results += '<br />';
+    }
+  }
+  samples.innerHTML = html_results;
+}
+
 document.addEventListener('DOMContentLoaded', restore_options);
+document.addEventListener('DOMContentLoaded', updateSamples);
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("save_button").addEventListener('click', save_options);
+}, false);
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById("Locales").addEventListener('keyup', updateSamples);
+}, false);
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById("Timezones").addEventListener('keyup', updateSamples);
 }, false);

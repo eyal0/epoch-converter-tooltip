@@ -57,18 +57,25 @@
   function processText(input) {
     var time_int = parseInt(input);
     var best_date;
-    for (var exponent = -3; exponent <= 6; exponent+=3) {
+    for (var exponent = 0; exponent <= 6; exponent+=3) {
       var current_date = new Date(Math.pow(10, exponent) * time_int);
       if (!best_date || Math.abs(new Date() - current_date) < Math.abs(new Date() - best_date)) {
         best_date = current_date;
       }
     }
     var html_results = '<div>';
-    if (options['show_local_time']) {
-      html_results += best_date.toString() + '<br />';
-    }
-    if (options['show_utc']) {
-      html_results += best_date.toUTCString() + "<br />";
+    var locales = options["locales"].split(',');
+    var timezones = options["timezones"].split(',');
+    for (var l=0; l < locales.length; l++) {
+      var locale = locales[l];
+      for (var t=0; t < timezones.length; t++) {
+        var timezone = timezones[t];
+        try {
+          html_results += best_date.toLocaleString(locale, {'timeZoneName': 'short', 'timeZone': timezone}) 
+        } catch (err) {
+        }
+        html_results += '<br />';
+      }
     }
     html_results += "</div>";
     showToolTip(html_results);
@@ -298,8 +305,8 @@
     if(current_options['trigger_keyboard_shift'] == undefined) current_options['trigger_keyboard_shift'] = 0;
     if(current_options['tooltipCharacter'] == undefined) current_options['tooltipCharacter'] = 'T';
 
-    if(current_options['show_local_time'] == undefined) current_options['show_local_time'] = 0;
-    if(current_options['show_utc'] == undefined) current_options['show_utc'] = 1;
+    if(current_options['locales'] == undefined) current_options['locales'] = "en-US";
+    if(current_options['timezones'] == undefined) current_options['timezones'] = "UTC,PST";
     
     if(current_options['hide_move'] == undefined) current_options['hide_move'] = 1;
     if(current_options['hide_click'] == undefined) current_options['hide_click'] = 1;

@@ -1,6 +1,8 @@
 ﻿<html>
 <head><title>Epoch Converter Tooltip for Google Chrome™</title>
-<script type="text/javascript" src="ECT-options.js"></script>
+  <script type="text/javascript" src="ECT-options.js"></script>
+
+</head>
 <body>
   <img src="ECT-128.png"><br />
   <h1>Epoch Converter Tooltip for Google Chrome™</h1>
@@ -24,8 +26,10 @@
       &nbsp; &nbsp; <input type="checkbox" id="TriggerKeyboardAlt"/><label for="TriggerKeyboardAlt">With Alt</label><br />
       &nbsp; &nbsp; <input type="checkbox" id="TriggerKeyboardShift"/><label for="TriggerKeyboardShift">With Shift</label><br />
     <h3>Display options</h3>
-      <input type="checkbox" id="ShowLocalTime"/><label for="ShowLocalTime">Show Local Time</label><br />
-      <input type="checkbox" id="ShowUTC"/><label for="ShowUTC">Show UTC</label><br />
+      <label for="Locales">Comma-separated <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation">locales</a> (try "en-US,ar-EG") </label><input type="text" id="Locales"/><br />
+      <label for="Timezones">Comma-separated <a href="http://www.timeanddate.com/time/zones/">timezones</a> (try "UTC,America/Los_Angeles") </label><input type="text" id="Timezones"/><br />
+      <h4>Samples</h4>
+      <div id="samples"></div>
 
     <h2>Hide tooltip</h2>
       <input type="checkbox" id="HideMove"/><label for="HideMove">Hide Tooltip after moving mouse</label><br />

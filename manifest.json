@@ -3,7 +3,6 @@
   "version": "1.0",
   "manifest_version": 2,
   "description": "Convert timestamps to readable times",
-  "default_locale": "en",
   "icons": {
     "16": "ECT-16.png",
     "48": "ECT-48.png",
