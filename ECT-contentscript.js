@@ -57,7 +57,7 @@
   function processText(input) {
     var time_int = parseInt(input);
     var best_date;
-    for (var exponent = 0; exponent <= 6; exponent+=3) {
+    for (var exponent = -6; exponent <= 0; exponent+=3) {
       var current_date = new Date(Math.pow(10, exponent) * time_int);
       if (!best_date || Math.abs(new Date() - current_date) < Math.abs(new Date() - best_date)) {
         best_date = current_date;
@@ -72,9 +72,11 @@
         var timezone = timezones[t];
         try {
           html_results += best_date.toLocaleString(locale, {'timeZoneName': 'short', 'timeZone': timezone}) 
+          if (t<timezones.length-1) {
+            html_results += '<br />';
+          }
         } catch (err) {
         }
-        html_results += '<br />';
       }
     }
     html_results += "</div>";
