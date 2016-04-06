@@ -57,7 +57,9 @@
   function processText(input) {
     var time_int = parseInt(input);
     var best_date;
-    for (var exponent = -6; exponent <= 0; exponent+=3) {
+    // Date() expects millis.  s->ms require 10**3
+    // ns->ms requires 10**(-6)
+    for (var exponent = -6; exponent <= 3; exponent+=3) {
       var current_date = new Date(Math.pow(10, exponent) * time_int);
       if (!best_date || Math.abs(new Date() - current_date) < Math.abs(new Date() - best_date)) {
         best_date = current_date;
