@@ -1,6 +1,6 @@
 ﻿{
   "name": "Epoch Converter Tooltip for Google Chrome™",
-  "version": "1.2",
+  "version": "1.3",
   "manifest_version": 2,
   "description": "Convert timestamps to readable times",
   "icons": {
