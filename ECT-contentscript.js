@@ -203,6 +203,16 @@
 
     if(options['copy_on_key_press'] ) {
       if(e.ctrlKey) {
+        try {
+          window.getSelection().removeAllRanges();
+          var x = tooltip;
+          var range = document.createRange();
+          range.selectNode(x);
+          window.getSelection().addRange(range);
+          document.execCommand('copy');
+          catch (err) {
+            console.log('Oops, unable to copy' + err);
+          }
         tooltip.select();
         try {
           var successful = document.execCommand('copy');
