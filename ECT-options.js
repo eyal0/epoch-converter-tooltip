@@ -32,6 +32,10 @@ function save_options() {
                   'keep_on_screen' : document.getElementById("KeepOnScreen").checked,
                   
                   'activity_indicator' : document.getElementById("ActivityIndicator").checked};
+
+                  'copy_on_key_press' : document.getElementById("CopyOnKeyPress").checked};
+
+
   localStorage["options"] = JSON.stringify(options);
 }
 
@@ -74,6 +78,8 @@ function restore_options() {
   
   if(options['activity_indicator'] == undefined) options['activity_indicator'] = 1;
 
+  if(options['copy_on_key_press'] == undefined) options['copy_on_key_press'] = 1;
+
   document.getElementById("TriggerHover").checked = options['trigger_hover'];
   document.getElementById("TriggerHoverDelay").value = options['tooltipDelay'];
 
@@ -108,6 +114,8 @@ function restore_options() {
   document.getElementById("KeepOnScreen").checked = options['keep_on_screen'];
   
   document.getElementById("ActivityIndicator").checked = options['activity_indicator'];
+
+  document.getElementById("CopyOnKeyPress").checked = options['copy_on_key_press'];
 }
 
 function updateSamples() {

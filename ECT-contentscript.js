@@ -192,22 +192,32 @@
 
   function keypress(event) {
     var e = event;
-    
-    //GM_log("got keypress");
-    if(options['hide_keyboard'])
-      hide(true); //hide the old one if there is one
-
     var keynum;
     var keychar;
-    var numcheck;
-    var text;
+    keychar = String.fromCharCode(keynum);
 
     if(window.event) // IE
       keynum = e.keyCode;
     else if(e.which) // Netscape/Firefox/Opera
       keynum = e.which;
 
-    keychar = String.fromCharCode(keynum);
+    if(options['copy_on_key_press'] ) {
+      if(e.ctrlKey) {
+        tooltip.select();
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'successful' : 'unsuccessful';
+          console.log('Copying text command was ' + msg);
+        } catch (err) {
+          console.log('Oops, unable to copy');
+        }
+      }
+    }
+
+    //GM_log("got keypress");
+    if(options['hide_keyboard'])
+      hide(true); //hide the old one if there is one
+
     //GM_log("keychar is " + keychar);
     if(options['trigger_keyboard'] &&
        (options['tooltipCharacter'] == '' || options['tooltipCharacter'].indexOf(keychar) >= 0) &&
@@ -322,7 +332,9 @@
     if(current_options['keep_on_screen'] == undefined) current_options['keep_on_screen'] = 1;
     
     if(current_options['activity_indicator'] == undefined) current_options['activity_indicator'] = 1;
-    
+
+    if(current_options['copy_on_key_press'] == undefined) current_options['copy_on_key_press'] = 1;
+
     options = current_options;
 
     if(options['trigger_hover'] || options['hide_move']) {
@@ -336,8 +348,6 @@
     }
     if(options['trigger_keyboard'] || options['hide_keyboard']) {
       window.addEventListener("keypress", keypress, false);
-    }
-    if(options['trigger_keyboard'] || options['hide_keyboard']) {
       window.addEventListener("keydown", keypress, false);
     }
     if(options['hide_scroll']) {
