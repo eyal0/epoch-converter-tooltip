@@ -16,6 +16,9 @@
 
       tooltip.style.width = "auto";
       tooltip.style.height = "auto";
+      if (options['copy_on_key_press']) {
+	html_results += '<div class="ECTActivityIndicator">Press Control to Copy to clipboard</div>';
+      }
       tooltip.innerHTML = html_results;
       tooltip.firstChild.style.marginTop = "0";
       tooltip.firstChild.style.marginRight = "0";
@@ -201,27 +204,21 @@
     else if(e.which) // Netscape/Firefox/Opera
       keynum = e.which;
 
-    if(options['copy_on_key_press'] ) {
-      if(e.ctrlKey) {
-        try {
-          window.getSelection().removeAllRanges();
-          var x = tooltip;
-          var range = document.createRange();
-          range.selectNode(x);
-          window.getSelection().addRange(range);
-          document.execCommand('copy');
-          catch (err) {
-            console.log('Oops, unable to copy' + err);
-          }
-        tooltip.select();
-        try {
-          var successful = document.execCommand('copy');
-          var msg = successful ? 'successful' : 'unsuccessful';
-          console.log('Copying text command was ' + msg);
-        } catch (err) {
-          console.log('Oops, unable to copy');
-        }
+    if(options['copy_on_key_press'] && e.ctrlKey) {
+      try {
+        window.getSelection().removeAllRanges();
+        var range = document.createRange();
+        range.selectNode(tooltip.children[0]);
+        window.getSelection().addRange(range);
+        if (document.execCommand('copy')) {
+	  tooltip.children[1].innerText = "Copied!";
+	}
+	window.getSelection().removeAllRanges();
+      } catch (err) {
+        tooltip.children[1].innerText("Copy failed, see log.");
+	console.log('Oops, unable to copy: ' + err);
       }
+      return;
     }
 
     //GM_log("got keypress");

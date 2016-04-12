@@ -31,7 +31,7 @@ function save_options() {
                   'align_left' : document.getElementById("LocationX1").checked,
                   'keep_on_screen' : document.getElementById("KeepOnScreen").checked,
                   
-                  'activity_indicator' : document.getElementById("ActivityIndicator").checked};
+                  'activity_indicator' : document.getElementById("ActivityIndicator").checked,
 
                   'copy_on_key_press' : document.getElementById("CopyOnKeyPress").checked};
 
