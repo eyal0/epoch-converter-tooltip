@@ -103,7 +103,7 @@
         range.getBoundingClientRect().top  <= y && range.getBoundingClientRect().bottom >= y) {
       if (start + 1 == mid) {
         // Found it.
-        result0 = {'offset' : start, 'text_node' : elem};
+        return {'offset' : start, 'text_node' : elem};
       } else {
         // Need to recurse on this section.
         result0 = getStringOffsetFromPointHelper(elem, x, y, range, start, mid);
@@ -118,14 +118,13 @@
         range.getBoundingClientRect().top  <= y && range.getBoundingClientRect().bottom >= y) {
       if (mid + 1 == end) {
         // Found it.
-        result1 = {'offset' : start, 'text_node' : elem};
+        return {'offset' : start, 'text_node' : elem};
       } else {
         // Need to recurse on this section.
         result1 = getStringOffsetFromPointHelper(elem, x, y, range, mid, end);
       }
     }
-
-    return result0 || result1; // Only 1 should be valid.
+    return result0 || result1; // At most 1 should be valid.
   }
 
   function getStringOffsetFromPoint(elem, x, y, range) {
