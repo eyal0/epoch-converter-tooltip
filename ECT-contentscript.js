@@ -235,7 +235,8 @@
     else if(e.which) // Netscape/Firefox/Opera
       keynum = e.which;
 
-    if(options['copy_on_key_press'] && e.ctrlKey) {
+    if(options['copy_on_key_press'] && e.ctrlKey &&
+        tooltip && tooltip.children && tooltip.children.length > 1) {
       try {
         window.getSelection().removeAllRanges();
         var range = document.createRange();
